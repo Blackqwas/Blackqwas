@@ -1,0 +1,49 @@
+echo "# Blackqwas" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/Blackqwas/Blackqwas.git
+git push -u origin main
+#!/usr/bin/env python3
+
+import json
+import sys
+
+def first_char_upper(s):
+    return s[0:1].upper() + s[1:]
+
+def first_char_lower(s):
+    return s[0:1].lower() + s[1:]
+
+def snake_case(l):
+    return "_".join(l)
+# method names in python should be _, but for a blog post, using the convention that the method creates is better
+def GoCase(l):
+    return "".join([first_char_upper(w) for w in l])
+
+def camelCase(l):
+    return first_char_lower(GoCase(l))
+
+def code(e):
+    s = ""
+    s += "    @XmlElement(name = \"{}\")".format(snake_case(e["name"])) + "\n"
+    s += "    private {} {};".format(e["type"], camelCase(e["name"])) + "\n"
+    s += "    public {} get{}() {{".format(e["type"], GoCase(e["name"])) + "\n"
+    s += "      return {};".format(camelCase(e["name"])) + "\n"
+    s += "    }" + "\n"
+    s += "" + "\n"
+    s += "    public {} set{}(final Object {}) {{".format(e["type"], GoCase(e["name"]), camelCase(e["name"])) + "\n"
+    s += "      this.{} = {}OrNull({});".format(camelCase(e["name"]), first_char_lower(e["type"]), camelCase(e["name"])) + "\n"
+    s += "    }" + "\n"
+    s += "\n"
+    return s
+
+# unix filter that takes JSON on stdin and writes Java on stdout
+# Built as RLW
+# R
+data = json.load(sys.stdin)
+# L
+output = "".join([code(e) for e in data])
+# W
+print(output)
